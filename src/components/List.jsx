@@ -11,20 +11,23 @@ function List(props) {
   const [value, setValue] = useState("");
   const [todoList, setTodoList] = useState(savedValue);
   const [current, setCurrent] = useState("all"); // three types: all finished unfinished
-  const handleAddTodoList = (e) => {
-    if (e.keyCode === 13 && search !== "") {
-      let slice = [...todoList];
-      slice.push({
-        content: search,
-        checked: false,
-        id: generateRdStr(),
-      });
-      setTodoList(slice);
-      setSearch("");
-      setValue("");
-      storage.set("todolist", slice);
-    }
-  };
+  const handleAddTodoList = useCallback(
+    (e) => {
+      if (e.keyCode === 13 && search !== "") {
+        let slice = [...todoList];
+        slice.push({
+          content: search,
+          checked: false,
+          id: generateRdStr(),
+        });
+        setTodoList(slice);
+        setSearch("");
+        setValue("");
+        storage.set("todolist", slice);
+      }
+    },
+    [search, todoList]
+  );
   const filteredTodoLists = useMemo(() => {
     if (current === "all") {
       return todoList.filter((item) => {
@@ -43,27 +46,36 @@ function List(props) {
       });
     }
   }, [current, value, todoList]);
-  const handleDeleteTodo = (id) => {
-    let slice = todoList.filter((item) => item.id !== id);
-    setTodoList(slice);
-    storage.set("todolist", slice);
-  };
-  const handleEditUpdate = (id, value) => {
-    let slice = [...todoList];
-    slice.forEach((item) => {
-      if (item.id === id) item.content = value;
-    });
-    setTodoList(slice);
-    storage.set("todolist", slice);
-  };
-  const handleRadioChange = (id, pre) => {
-    let slice = [...todoList];
-    slice.forEach((item) => {
-      if (item.id === id) item.checked = pre;
-    });
-    setTodoList(slice);
-    storage.set("todolist", slice);
-  };
+  const handleDeleteTodo = useCallback(
+    (id) => {
+      let slice = todoList.filter((item) => item.id !== id);
+      setTodoList(slice);
+      storage.set("todolist", slice);
+    },
+    [todoList]
+  );
+  const handleEditUpdate = useCallback(
+    (id, value) => {
+      let slice = [...todoList];
+      slice.forEach((item) => {
+        if (item.id === id) item.content = value;
+      });
+      setTodoList(slice);
+      storage.set("todolist", slice);
+    },
+    [todoList]
+  );
+  const handleRadioChange = useCallback(
+    (id, pre) => {
+      let slice = [...todoList];
+      slice.forEach((item) => {
+        if (item.id === id) item.checked = pre;
+      });
+      setTodoList(slice);
+      storage.set("todolist", slice);
+    },
+    [todoList]
+  );
   return (
     <div className="container" onKeyUp={handleAddTodoList}>
       <div>
